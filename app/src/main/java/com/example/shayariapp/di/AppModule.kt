@@ -16,20 +16,13 @@ import javax.inject.Singleton
 object AppModule {
 
     @Provides
-    @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): QuoteDatabase {
+    fun provideQuoteDatabase(@ApplicationContext context: Context): QuoteDatabase {
         return QuoteDatabase.getDatabase(context)
     }
 
     @Provides
-    @Singleton
     fun provideQuoteDao(database: QuoteDatabase): QuoteDao {
-        return database.quoteDao()
+        return database.getQuoteDao()
     }
 
-    @Provides
-    @Singleton
-    fun provideQuoteRepository(quoteDao: QuoteDao): QuoteRepository {
-        return QuoteRepository(quoteDao)
-    }
 }

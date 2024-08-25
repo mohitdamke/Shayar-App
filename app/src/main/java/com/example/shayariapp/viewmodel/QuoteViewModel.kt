@@ -1,57 +1,63 @@
 package com.example.shayariapp.viewmodel
 
 import android.content.Context
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.cachedIn
-import com.example.shayariapp.data.db.QuoteDatabase
 import com.example.shayariapp.data.db.QuoteEntity
 import com.example.shayariapp.domain.repository.QuoteRepository
+import com.example.shayariapp.notification.sendQuoteNotification
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class QuoteViewModel @Inject constructor(
-    private var repository: QuoteRepository
+    private var repository: QuoteRepository,
+
 ) : ViewModel() {
 
-    private val _loading = MutableLiveData<Boolean>()
-    val loading: LiveData<Boolean> get() = _loading
+    private val _quoteList = MutableStateFlow<List<QuoteEntity>>(emptyList())
+    val quoteList: StateFlow<List<QuoteEntity>> = _quoteList
 
-    val quotes = repository.getQuotes()
+    private val _bookmarkedQuotes = MutableStateFlow<List<QuoteEntity>>(emptyList())
+    val bookmarkedQuotes: StateFlow<List<QuoteEntity>> = _bookmarkedQuotes
 
-    fun saveQuote(quote: QuoteEntity) {
+    init {
+        getQuotes()
+    }
+
+    private fun getQuotes() {
         viewModelScope.launch {
-            try {
-                Log.d("QuoteViewModel", "Saving quote: $quote")
-                _loading.value = true
-                val updatedQuote = quote.copy(isSaved = !quote.isSaved)
-                repository.saveQuote(updatedQuote)
-                _loading.value = false
-            } catch (e: Exception) {
-                Log.e("QuoteViewModel", "Error saving quote", e)
+            repository.getAllQuote().collect { quotes ->
+                _quoteList.value = quotes
             }
         }
     }
 
-    fun getSavedQuotes(): LiveData<List<QuoteEntity>> {
-        return repository.getSavedQuotes()
-    }
-
-    fun loadQuotesFromJson(
-        context: Context,
-        quoteDatabase: QuoteDatabase = QuoteDatabase.getDatabase(context)
-    ) {
+    // Function to save a quote
+    fun saveOrUnsaveQuote(quote: QuoteEntity, context: Context) {
         viewModelScope.launch {
-            _loading.value = true
-            repository.loadQuotesFromJson(context = context, database = quoteDatabase)
-            _loading.value = false
+            // Toggle the isBookmarked property
+            _quoteList.value = _quoteList.value.map { it ->
+                if (it.id == quote.id) it.copy(isBookmarked = !quote.isBookmarked) else it
+            }
+
+            // Update quote in repository
+            repository.updateQuote(quote.copy(isBookmarked = !quote.isBookmarked))
+
+            // Send notification
+            sendQuoteNotification(context, quote.text ?: "", quote.author ?: "")
         }
     }
+    fun getBookmarkedQuotes() {
+        viewModelScope.launch {
+            repository.getBookmarkedQuotes().collect { quotes ->
+                _bookmarkedQuotes.value = quotes.filter { it.isBookmarked }
+            }
+        }
+    }
+
 }
+

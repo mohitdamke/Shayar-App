@@ -97,6 +97,9 @@ android {
         implementation("androidx.paging:paging-runtime:3.1.1")
         implementation("androidx.paging:paging-compose:3.3.2")
 
+        // Notification
+//        implementation("androidx.core:core-ktx:2.2.0")
+
 
         // Coroutines
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
