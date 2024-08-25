@@ -8,14 +8,15 @@ import javax.inject.Inject
 
 class QuoteRepository @Inject constructor(private val quoteDao: QuoteDao) {
 
-    fun getAllQuote() : Flow<List<QuoteEntity>> = quoteDao.getQuotes()
+    fun getAllQuote(): Flow<List<QuoteEntity>> = quoteDao.getQuotes()
 
     fun getBookmarkedQuotes(): Flow<List<QuoteEntity>> = quoteDao.getBookmarkedQuotes()
     suspend fun updateQuote(quote: QuoteEntity) {
         quoteDao.updateQuote(quote)
     }
+    fun searchQuotes(query: String): Flow<List<QuoteEntity>> {
+        return quoteDao.searchQuotes("%$query%")
+    }
 
-    // Function to get all saved quotes
-    fun getSavedQuotes(): Flow<List<QuoteEntity>> = quoteDao.getQuotes()
 }
 

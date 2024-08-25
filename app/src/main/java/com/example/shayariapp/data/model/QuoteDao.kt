@@ -1,12 +1,10 @@
 package com.example.shayariapp.data.model
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.shayariapp.data.db.Quote
 import com.example.shayariapp.data.db.QuoteEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -27,6 +25,9 @@ interface QuoteDao {
 
     @Query("SELECT * FROM quotes_table WHERE isBookmarked = 1")
     fun getBookmarkedQuotes(): Flow<List<QuoteEntity>>
+
+    @Query("SELECT * FROM quotes_table WHERE text LIKE :query")
+    fun searchQuotes(query: String): Flow<List<QuoteEntity>>
 
 
 }

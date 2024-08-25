@@ -59,5 +59,17 @@ class QuoteViewModel @Inject constructor(
         }
     }
 
+    fun searchQuotes(query: String) {
+        viewModelScope.launch {
+            repository.searchQuotes(query).collect { quotes ->
+                _quoteList.value = quotes
+            }
+        }
+    }
+
+
+
+
+
 }
 
