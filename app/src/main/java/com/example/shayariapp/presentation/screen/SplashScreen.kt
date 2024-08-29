@@ -15,7 +15,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.shayariapp.R
-import com.example.shayariapp.navcontrol.routes.Graph
+import com.example.shayariapp.navigation.Routes
 import kotlinx.coroutines.delay
 
 @Composable
@@ -25,9 +25,9 @@ fun SplashScreen(
 ) {
 
     LaunchedEffect(key1 = true) {
-        delay(1000)
-        navController.navigate(Graph.MainScreenGraph) {
-            popUpTo(Graph.SplashGraph) {
+        delay(2000)
+        navController.navigate(Routes.Home.route) {
+            popUpTo(Routes.Splash.route) {
                 inclusive = true
             }
         }
@@ -40,7 +40,7 @@ fun SplashScreen(
     ) {
 
         Image(
-            painter = painterResource(id = R.drawable.ic_launcher_background),
+            painter = painterResource(id = R.drawable.logo),
             contentDescription = null,
             modifier = Modifier
                 .size(160.dp)
@@ -48,17 +48,3 @@ fun SplashScreen(
         )
     }
 }
-//        Text(
-//            text = "FZ",
-//            fontSize = 100.sp,
-//            fontWeight = FontWeight.Bold,
-//            fontStyle = FontStyle.Italic ,
-//            color = Blue40
-//        )
-//        Text(text = "FriendZone",
-//            fontSize = 26.sp,
-//            fontWeight = FontWeight.Normal,
-//            fontStyle = FontStyle.Normal ,
-//            color = Blue40, letterSpacing = 10.sp)
-//
-

@@ -5,8 +5,8 @@ import android.util.Log
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.shayariapp.R
-import com.example.shayariapp.data.db.QuoteDatabase
-import com.example.shayariapp.data.db.QuoteEntity
+import com.example.shayariapp.data.db.ShayariDatabase
+import com.example.shayariapp.data.db.ShayariEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,62 +29,44 @@ class PrepopulateRoomCallback(private val context: Context) : RoomDatabase.Callb
 
 suspend fun prePopulateUsers(context: Context) {
     try {
-        val quoteDao = QuoteDatabase.getDatabase(context).getQuoteDao()
-
-        val quoteList: JSONArray = context.resources.openRawResource(R.raw.quotes).bufferedReader().use {
+        val shayariDao = ShayariDatabase.getDatabase(context).getShayariDao()
+//        val json = context.resources.openRawResource(R.raw.happiness).bufferedReader().use { it.readText() }
+//        val jsonArray = JSONArray(json)
+//        val shayariList = mutableListOf<ShayariEntity>()
+//
+//        for (i in 0 until jsonArray.length()) {
+//            val jsonObject = jsonArray.getJSONObject(i)
+//            val text = jsonObject.getString("text")
+//            val genre = jsonObject.getString("genre")
+//            shayariList.add(ShayariEntity(text = text, genre = genre))
+//        }
+//        shayariDao.insertShayariList(shayariList)
+//
+//        Log.e("Data Fetch TAG", "Successfully pre-populated ${shayariList.size} quotes into the database")
+        val shayariList: JSONArray = context.resources.openRawResource(R.raw.shayari).bufferedReader().use {
             JSONArray(it.readText())
         }
 
-        if (quoteList.length() > 0) {
-            for (index in 0 until quoteList.length()) {
-                val quoteObj = quoteList.getJSONObject(index)
+        Log.e("Data Fetch TAG", "JSON Data: $shayariList")
+
+        if (shayariList.length() > 0) {
+            for (index in 0 until shayariList.length()) {
+                val jsonObj = shayariList.getJSONObject(index)
 
                 // Creating QuoteEntity and inserting it into the database
-                val quoteEntity = QuoteEntity(
-                    text = quoteObj.getString("text"),
-                    author = quoteObj.getString("author")
-                )
-                quoteDao.insertQuote(quoteEntity)
+                val shayariEntity = ShayariEntity(
+                    text = jsonObj.getString("text"),
+                    genre =  jsonObj.getString("genre")
 
-                Log.e("Data Fetch TAG", "Inserted quote: ${quoteEntity.text}, ID: ${quoteEntity.id}")
+                )
+                shayariDao.insertShayari(shayariEntity)
+
+                Log.e("Data Fetch TAG", "Inserted quote: ${shayariEntity.text}, ID: ${shayariEntity.id}")
             }
-            Log.e("Data Fetch TAG", "Successfully pre-populated ${quoteList.length()} quotes into the database")
+            Log.e("Data Fetch TAG", "Successfully pre-populated ${shayariList.length()} quotes into the database")
         }
     } catch (exception: Exception) {
         Log.e("Data Fetch TAG", "Failed to pre-populate quotes into database: ${exception.localizedMessage}")
     }
 }
 
-
-//suspend fun prePopulateUsers(context: Context) {
-//    try {
-//        val quoteDao = QuoteDatabase.getDatabase(context).getQuoteDao()
-//
-//        val quoteList: JSONArray =
-//            context.resources.openRawResource(R.raw.quotes).bufferedReader().use {
-//                JSONArray(it.readText())
-//            }
-//
-//        quoteList.takeIf { it.length() > 0 }?.let {
-//            Log.e("Data Fetch TAG", "successfully pre-populated quote into database This 4")
-//            for (index in 0 until quoteList.length()) {
-//                val quoteObj = quoteList.getJSONObject(index)
-//                quoteDao.insertQuote(
-//
-//                    QuoteEntity(
-//                        text = quoteObj.getString("text"),
-//                        author = quoteObj.getString("author"),
-//                    )
-//
-//                )
-//                Log.e("Data Fetch TAG", "Inserted quote: ${quoteEntity.text}, ID: ${quoteEntity.id}")
-//            }
-//            Log.e("Data Fetch TAG", "successfully pre-populated quote into database This 6")
-//        }
-//    } catch (exception: Exception) {
-//        Log.e(
-//            "Data Fetch TAG",
-//            exception.localizedMessage ?: "failed to pre-populate quote into database"
-//        )
-//    }
-//}
