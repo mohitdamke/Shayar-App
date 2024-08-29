@@ -13,6 +13,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.shayariapp.navigation.NavigationControl
 import com.example.shayariapp.notification.createNotificationChannel
+import com.example.shayariapp.widget.ShayariWidgetWorker
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.TimeUnit
 

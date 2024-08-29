@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".TestWidgetReceiver"
+        <receiver android:name=".widget.TestWidgetReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

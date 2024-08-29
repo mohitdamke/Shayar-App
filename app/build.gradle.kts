@@ -82,9 +82,9 @@ android {
         debugImplementation(libs.androidx.ui.tooling)
         debugImplementation(libs.androidx.ui.test.manifest)
 
-        implementation("com.squareup.retrofit2:retrofit:2.7.2")
-        implementation("com.squareup.retrofit2:converter-gson:2.7.2")
-        implementation("com.squareup.okhttp3:okhttp:3.6.0")
+        implementation("com.squareup.retrofit2:retrofit:2.11.0")
+        implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+        implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
 
 
@@ -92,15 +92,6 @@ android {
         implementation("androidx.room:room-ktx:2.6.1")
         kapt("androidx.room:room-compiler:2.6.1")
         implementation("androidx.room:room-runtime:2.6.1")
-        implementation("androidx.room:room-paging:2.6.1")
-
-//      Paging
-        implementation("androidx.paging:paging-runtime:3.1.1")
-        implementation("androidx.paging:paging-compose:3.3.2")
-
-        // Notification
-//        implementation("androidx.core:core-ktx:2.2.0")
-
 
         // Coroutines
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")

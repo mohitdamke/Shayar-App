@@ -1,4 +1,4 @@
-package com.example.shayariapp
+package com.example.shayariapp.widget
 
 import android.content.Context
 import androidx.compose.ui.graphics.Color
@@ -12,10 +12,8 @@ import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
-import androidx.glance.color.DynamicThemeColorProviders.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
-import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.padding
 import androidx.glance.text.FontFamily
@@ -24,8 +22,8 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import com.example.shayariapp.MainActivity
 import com.example.shayariapp.data.db.ShayariDatabase
-import com.example.shayariapp.data.db.ShayariDatabase_Impl
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlin.random.Random

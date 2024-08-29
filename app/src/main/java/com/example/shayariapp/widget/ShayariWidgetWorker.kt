@@ -1,4 +1,4 @@
-package com.example.shayariapp
+package com.example.shayariapp.widget
 
 import android.content.Context
 import androidx.glance.appwidget.GlanceAppWidgetManager
