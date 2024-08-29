@@ -1,4 +1,4 @@
-package com.example.shayariapp.data
+package com.example.shayariapp.data.model
 
 import android.content.Context
 import android.util.Log

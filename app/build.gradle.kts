@@ -73,6 +73,7 @@ android {
         implementation(libs.androidx.datastore.core.android)
         implementation(libs.androidx.appcompat)
         implementation(libs.androidx.runtime.livedata)
+        implementation(libs.androidx.work.runtime.ktx)
         testImplementation(libs.junit)
         androidTestImplementation(libs.androidx.junit)
         androidTestImplementation(libs.androidx.espresso.core)
@@ -124,6 +125,9 @@ android {
 
         implementation("androidx.compose.material3:material3:1.2.0-rc01")
 
+// Glance
 
+        implementation("androidx.glance:glance-appwidget:1.1.0")
+        implementation("androidx.glance:glance-material3:1.1.0")
 
 }

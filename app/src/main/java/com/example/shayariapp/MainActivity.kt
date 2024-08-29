@@ -8,9 +8,13 @@ import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.shayariapp.navigation.NavigationControl
 import com.example.shayariapp.notification.createNotificationChannel
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -27,8 +31,19 @@ class MainActivity : ComponentActivity() {
         setContent {
             NavigationControl()
         }
+        scheduleWidgetUpdate()
     }
 
+    private fun scheduleWidgetUpdate() {
+        val workRequest = PeriodicWorkRequestBuilder<ShayariWidgetWorker>(30, TimeUnit.MINUTES)
+            .build()
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "ShayariWidgetUpdate",
+            ExistingPeriodicWorkPolicy.REPLACE,
+            workRequest
+        )
+    }
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun checkNotificationPermission() {
         if (ContextCompat.checkSelfPermission(

@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.shayariapp.data.PrepopulateRoomCallback
+import com.example.shayariapp.data.model.PrepopulateRoomCallback
 import com.example.shayariapp.data.model.ShayariDao
 
 @Database(entities = [ShayariEntity::class], version = 1, exportSchema = false)
@@ -26,7 +26,6 @@ abstract class ShayariDatabase : RoomDatabase() {
                 DB_INSTANCE = instance
                 instance
             }
-
         }
     }
 
