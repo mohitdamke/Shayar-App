@@ -6,6 +6,7 @@ import androidx.glance.appwidget.updateAll
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.shayariapp.data.db.ShayariDatabase
+import com.example.shayariapp.notification.sendQuoteNotification
 import kotlinx.coroutines.flow.first
 import kotlin.random.Random
 
@@ -27,7 +28,7 @@ class ShayariWidgetWorker(context: Context, params: WorkerParameters) : Coroutin
         widgetIds.forEach { glanceId ->
             SimpleWidget().updateAll(applicationContext)
         }
-
+        sendQuoteNotification(applicationContext, randomShayari)
         return Result.success()
     }
 }

@@ -5,13 +5,17 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import com.example.shayariapp.navigation.NavigationControl
+import com.example.shayariapp.notification.ShayariNotificationWorker
 import com.example.shayariapp.notification.createNotificationChannel
 import com.example.shayariapp.widget.ShayariWidgetWorker
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,6 +29,7 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         createNotificationChannel(context)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             checkNotificationPermission()
@@ -33,6 +38,7 @@ class MainActivity : ComponentActivity() {
             NavigationControl()
         }
         scheduleWidgetUpdate()
+        scheduleShayariNotification()
     }
 
     private fun scheduleWidgetUpdate() {
@@ -45,6 +51,15 @@ class MainActivity : ComponentActivity() {
             workRequest
         )
     }
+
+    private fun scheduleShayariNotification() {
+        val workRequest: WorkRequest = OneTimeWorkRequestBuilder<ShayariNotificationWorker>()
+            .setInitialDelay(6, TimeUnit.HOURS) // Schedule for 6 hours from now
+            .build()
+
+        WorkManager.getInstance(applicationContext).enqueue(workRequest)
+    }
+
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun checkNotificationPermission() {
         if (ContextCompat.checkSelfPermission(

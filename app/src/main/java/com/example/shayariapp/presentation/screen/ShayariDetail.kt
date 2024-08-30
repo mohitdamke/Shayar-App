@@ -4,10 +4,16 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
+import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,15 +21,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.IosShare
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -31,172 +38,231 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.drawToBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.shayariapp.ui.theme.Blue100
-import com.example.shayariapp.ui.theme.Blue40
+import com.example.shayariapp.R
+import com.example.shayariapp.ui.theme.Gray100
+import com.example.shayariapp.ui.theme.Gray40
 import com.example.shayariapp.viewmodel.ShayariViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
-fun ShayariDetail(
+fun ShayariDetailScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
     shayariId: String,
 ) {
     val context = LocalContext.current
+    val captureView = LocalView.current
+    val scope = rememberCoroutineScope()
     val viewModel: ShayariViewModel = hiltViewModel()
     val shayari by viewModel.getShayariById(shayariId).collectAsState(initial = null)
     val clipboardManager: ClipboardManager =
         context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    var fullScreenshot by remember { mutableStateOf<Bitmap?>(null) }
+    var isIconsVisible by remember { mutableStateOf(true) }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(White)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        shayari?.let { quote ->
-            ShayariDetailItem(
-                shayariId = quote.id.toString(),
-                quote = quote.text ?: "",
-                isBookmarked = quote.isBookmarked,
-                onSaveClicked = { viewModel.saveOrUnsaveQuote(quote, context) },
-                onCopy = {
-                    val clip = ClipData.newPlainText(
-                        "Quote",
-                        quote.text
-                    )
-                    clipboardManager.setPrimaryClip(clip)
-                    Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT)
-                        .show()
-                },
-                onShare = {
-                    val shareIntent = Intent().apply {
-                        action = Intent.ACTION_SEND
-                        putExtra(Intent.EXTRA_TEXT, quote.text)
-                        type = "text/plain"
+    shayari?.let { quote ->
+        ShayariDetailItem(
+            quote = quote.text,
+            isBookmarked = quote.isBookmarked,
+            onSaveClicked = { viewModel.saveOrUnsaveQuote(quote, context) },
+            onCopyClicked = {
+                val clip = ClipData.newPlainText(
+                    "Quote", quote.text
+                )
+                clipboardManager.setPrimaryClip(clip)
+                Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT).show()
+            },
+            onShareClicked = {
+                scope.launch {
+                    Toast.makeText(context, "Sharing...", Toast.LENGTH_SHORT).show()
+                    isIconsVisible = false
+                    delay(500)
+                    fullScreenshot = captureView.drawToBitmap(Bitmap.Config.ARGB_8888)
+                    isIconsVisible = true
+                    if (fullScreenshot != null) {
+                        shareImageContent(fullScreenshot!!, context)
                     }
-                    context.startActivity(Intent.createChooser(shareIntent, "Share via"))
-                })
-        } ?: run {
-            Text(
-                text = "Loading quote details...",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
+                }
+            }, isIconsVisible = isIconsVisible
+        )
+    } ?: run {
+        Column(
+            modifier = modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
 
-        LaunchedEffect(key1 = shayari) {
-            Log.e("Data Fetch TAG", "Quote loaded with ID: $shayariId")
+            Text(
+                text = "Loading quote details...", fontSize = 20.sp, fontWeight = FontWeight.Bold
+            )
+            CircularProgressIndicator()
         }
+    }
+
+    LaunchedEffect(key1 = shayari) {
+        Log.e("Data Fetch TAG", "Quote loaded with ID: $shayariId")
     }
 }
 
+
 @Composable
 private fun ShayariDetailItem(
-    shayariId: String,
+    modifier: Modifier = Modifier,
     quote: String,
     isBookmarked: Boolean,
     onSaveClicked: () -> Unit,
-    onShare: () -> Unit,
-    onCopy: () -> Unit
+    onShareClicked: () -> Unit,
+    onCopyClicked: () -> Unit,
+    isIconsVisible: Boolean
 ) {
     Scaffold { paddingValues ->
-        Card(
-            modifier = Modifier
+        Box(
+            modifier = modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            elevation = CardDefaults.cardElevation(10.dp),
-            colors = CardDefaults.cardColors(White)
+                .background(Gray100)
         ) {
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxSize()
-                    .padding(16.dp),
+                    .padding(paddingValues)
+                    .padding(40.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Spacer(modifier = Modifier.height(10.dp))
-
-
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = quote,
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center
-                )
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp)
+                Box(
+                    modifier = modifier
+                        .fillMaxSize(), contentAlignment = Alignment.Center
                 ) {
-                    Button(
-                        onClick = onSaveClicked,
-                        modifier = Modifier.padding(top = 18.dp),
-                        colors = ButtonColors(
-                            containerColor = Blue40,
-                            contentColor = White,
-                            disabledContainerColor = Blue100,
-                            disabledContentColor = White
-                        )
+                    Column(
+                        modifier = modifier,
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Icon(
-                            imageVector = if (isBookmarked) Icons.Default.Bookmark else
-                                Icons.Default.BookmarkBorder,
-                            contentDescription = null, modifier = Modifier.padding(2.dp)
+                        Text(
+                            text = quote,
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Medium,
+                            textAlign = TextAlign.Center,
+                            color = White
                         )
-                    }
-                    Button(
-                        onClick = { onCopy() },
-                        modifier = Modifier.padding(top = 18.dp),
-                        colors = ButtonColors(
-                            containerColor = Blue40,
-                            contentColor = White,
-                            disabledContainerColor = Blue100,
-                            disabledContentColor = White
-                        )
-                    ) {
+                        Spacer(modifier = modifier.padding(top = 10.dp))
+                        Card(
+                            modifier = modifier
+                                .padding(10.dp),
+                            colors = CardDefaults.cardColors(White)
+                        ) {
+                            Row(
+                                modifier = modifier
+                                    .padding(4.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.logo),
+                                    contentDescription = "logo",
+                                    modifier = modifier
+                                        .size(26.dp)
+                                        .clip(
+                                            CircleShape
+                                        )
+                                )
+                                Spacer(modifier = modifier.padding(start = 6.dp))
+                                Text(
+                                    text = "shayar.app",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    textAlign = TextAlign.Center,
+                                    color = Black
+                                )
+                            }
+                        }
 
-                        Icon(
-                            imageVector = Icons.Default.ContentCopy,
-                            contentDescription = "Copy to clipboard",
-                            modifier = Modifier.padding(2.dp)
-                        )
                     }
-                    Button(
-                        onClick = {
-                            onShare()
-                        },
-                        modifier = Modifier.padding(top = 18.dp),
-                        colors = ButtonColors(
-                            containerColor = Blue40,
-                            contentColor = White,
-                            disabledContainerColor = Blue100,
-                            disabledContentColor = White
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Share,
-                            contentDescription = "Share quote", modifier = Modifier.padding(2.dp)
-                        )
+                    if (isIconsVisible) {
+                        Row(
+                            modifier = modifier
+                                .fillMaxWidth()
+                                .align(Alignment.BottomCenter)
+                                .padding(bottom = 100.dp),
+                            horizontalArrangement = Arrangement.spacedBy(30.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+
+                            ) {
+                            Spacer(modifier = modifier.padding(start = 40.dp))
+
+                            Icon(imageVector = if (isBookmarked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                contentDescription = null,
+                                modifier = modifier
+                                    .clickable {
+                                        onSaveClicked()
+                                    }
+                                    .size(40.dp),
+                                tint = White)
+
+
+                            Icon(imageVector = Icons.Default.ContentCopy,
+                                contentDescription = "Copy to clipboard",
+                                modifier = modifier
+                                    .clickable {
+                                        onCopyClicked()
+                                    }
+                                    .size(40.dp),
+                                tint = White)
+
+
+                            Icon(imageVector = Icons.Filled.IosShare,
+                                contentDescription = "Share quote",
+                                modifier = modifier
+                                    .clickable {
+                                        onShareClicked()
+                                    }
+                                    .size(40.dp),
+                                tint = White
+
+                            )
+                        }
                     }
+
                 }
             }
         }
     }
 }
+
+
+// Function to share the captured image
+private fun shareImageContent(image: Bitmap, context: Context) {
+    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "image/png"
+        putExtra(
+            Intent.EXTRA_STREAM, Uri.parse(
+                MediaStore.Images.Media.insertImage(
+                    context.contentResolver, image, "Shayari", "Shayari Wallpaper"
+                )
+            )
+        )
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    context.startActivity(Intent.createChooser(shareIntent, "Share Shayari"))
+}
+
 

@@ -1,60 +1,48 @@
 package com.example.shayariapp.presentation.screen
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Black
-import androidx.compose.ui.graphics.Color.Companion.Gray
-import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -62,8 +50,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.shayariapp.R
+import com.example.shayariapp.common.ShimmerEffect
 import com.example.shayariapp.navigation.Routes
+import com.example.shayariapp.ui.theme.Gray100
+import com.example.shayariapp.ui.theme.Gray40
 import com.example.shayariapp.viewmodel.ShayariViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,13 +64,9 @@ fun HomeScreen(
     navController: NavController = rememberNavController(),
 ) {
 
-
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val viewModel: ShayariViewModel = hiltViewModel()
-    val shayari by viewModel.quoteList.collectAsState(initial = emptyList())
-
-    val scope = rememberCoroutineScope()
-    val listState = rememberLazyGridState()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val isLoading by viewModel.isLoading.observeAsState(true)
 
 
     Scaffold(
@@ -89,97 +75,68 @@ fun HomeScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Shayar",
+                        text = "Shayar",
                         maxLines = 1,
                         letterSpacing = 1.sp, fontSize = 38.sp,
                         overflow = TextOverflow.Visible,
-                        fontStyle = FontStyle.Italic,
+                        fontStyle = FontStyle.Normal,
                         fontWeight = FontWeight.ExtraBold,
-                        fontFamily = FontFamily.Cursive,
-                        color = Black
+                        fontFamily = FontFamily.SansSerif,
+                        color = White
                     )
                 },
-                actions =  {
+                actions = {
                     IconButton(onClick = { navController.navigate(Routes.Saved.route) }) {
                         Icon(
-                            imageVector = Icons.Filled.Bookmark,
+                            imageVector = Icons.Outlined.FavoriteBorder,
                             contentDescription = "Localized description",
-                            modifier = modifier.size(30.dp)
+                            modifier = modifier.size(28.dp)
                         )
                     }
                     IconButton(onClick = { navController.navigate(Routes.Setting.route) }) {
                         Icon(
-                            imageVector = Icons.Filled.MoreVert,
+                            imageVector = Icons.Filled.Settings,
                             contentDescription = "Setting",
-                            modifier = modifier.size(30.dp)
+                            modifier = modifier.size(28.dp)
                         )
                     }
                 }, colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.White,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    containerColor = Gray100,
+                    titleContentColor = Gray100,
+                    actionIconContentColor = White,
+                    navigationIconContentColor = White,
+                    scrolledContainerColor = Gray100
                 ),
                 scrollBehavior = scrollBehavior
             )
         },
     ) { padding ->
-        Column(
+
+        LazyColumn(
             modifier = modifier
                 .fillMaxSize()
-                .background(Color.White)
-                .padding(padding),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(padding)
+                .background(Gray100),
+            contentPadding = PaddingValues(2.dp)
         ) {
-
-            if (shayari.isEmpty()) {
-                Column(
-                    modifier = modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    CircularProgressIndicator()
-                    Text(
-                        text = "Shayari is loading",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+            if (isLoading) {
+                items(11) { // Show a few shimmer cards while loading
+                    ShimmerGenreCard()
                 }
             } else {
-                LazyVerticalGrid(
-                    state = listState,
-                    contentPadding = PaddingValues(top = 1.dp),
-                    columns = GridCells.Adaptive(190.dp),
-                ) {
-                    items(
-                        listOf(
-                            "Love" to R.drawable.a,
-                            "Friendship" to R.drawable.b,
-                            "Motivation" to R.drawable.c,
-                            "Sadness" to R.drawable.d,
-                            "Happiness" to R.drawable.e,
-                            "Romance" to R.drawable.f,
-                            "Life" to R.drawable.g,
-                            "Patriotism" to R.drawable.h,
-                            "Good Morning" to R.drawable.i,
-                            "Good Night" to R.drawable.j,
-                            "Festivals" to R.drawable.k,
-                            "Heartbreak" to R.drawable.l,
-                            "Humor" to R.drawable.m,
-                            "Success" to R.drawable.n,
-                            "Nature" to R.drawable.o,
-                            "Spiritual" to R.drawable.p,
-                            "Celebration" to R.drawable.q,
-                            "Memories" to R.drawable.r,
-                            "Wisdom" to R.drawable.s,
-                            "Family" to R.drawable.t
-                        )
-
-                    ) { (genre, image) ->
-                        ShayariGenre(
-                            genre = genre,
-                            image = image,
-                            navController = navController
-                        )
-                    }
+                // Display the genres when loading is complete
+                items(
+                    listOf(
+                        "Love", "Friendship", "Motivation", "Sadness", "Happiness",
+                        "Romance", "Life", "Patriotism", "Good Morning", "Good Night",
+                        "Festivals", "Heartbreak", "Humor", "Success", "Nature",
+                        "Spiritual", "Celebration", "Memories", "Wisdom", "Family"
+                    )
+                ) { genre ->
+                    ShayariGenre(
+                        genre = genre,
+                        navController = navController
+                    )
                 }
             }
         }
@@ -191,70 +148,69 @@ fun HomeScreen(
 private fun ShayariGenre(
     modifier: Modifier = Modifier,
     genre: String,
-    image: Int,
     navController: NavController
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(10.dp),
+            .padding(6.dp)
+            .height(60.dp)
+            .clickable {
+                navController.navigate(
+                    Routes.ShayariList.route.replace("{genre}", genre)
+                )
+            },
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(Color.White),
-    ) {
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .height(130.dp)
-                .align(Alignment.CenterHorizontally)
+        colors = CardDefaults.cardColors(Gray40),
+
         ) {
-
-            Image(
-                painter = painterResource(id = image),
-                contentDescription = "image",
-                modifier = modifier
-                    .size(190.dp)
-                    .clickable {
-                        navController.navigate(
-                            Routes.ShayariList.route.replace("{genre}", genre)
-                        )
-                    },
-                contentScale = ContentScale.Crop,
-            )
-
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Spacer(modifier = modifier.padding(start = 10.dp))
             Text(
-                text = genre,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.ExtraBold,
+                text = "$genre Shayari",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center,
                 color = White,
-                fontStyle = FontStyle.Italic,
+                fontStyle = FontStyle.Normal,
                 modifier = modifier
-                    .align(Alignment.Center)
-                    .shadow(elevation = 10.dp, ambientColor = Black, spotColor = White)
+            )
+            Spacer(modifier = modifier.weight(1f))
+            Icon(
+                imageVector = Icons.Filled.ArrowForwardIos,
+                contentDescription = "ArrowForwardIos",
+                modifier = modifier.size(30.dp), tint = White
             )
         }
-
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun ShimmerGenreCard(modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(6.dp)
+            .height(60.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(Gray100),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        ) {
+            ShimmerEffect(
+                modifier = Modifier.fillMaxSize()
+                    .weight(1f)
+                    .background(Gray100, RoundedCornerShape(8.dp))
+            )
+        }
+    }
+}

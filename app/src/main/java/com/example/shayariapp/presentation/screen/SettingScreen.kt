@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -29,10 +30,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -42,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.shayariapp.navigation.Routes
 import com.example.shayariapp.ui.theme.Blue100
+import com.example.shayariapp.ui.theme.Gray100
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,8 +59,11 @@ fun SettingScreen(modifier: Modifier = Modifier, navController: NavController) {
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = White,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    containerColor = Gray100,
+                    titleContentColor = Gray100,
+                    actionIconContentColor = White,
+                    navigationIconContentColor = White,
+                    scrolledContainerColor = Gray100
                 ),
                 title = {
                     Text(
@@ -64,15 +71,16 @@ fun SettingScreen(modifier: Modifier = Modifier, navController: NavController) {
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color.White, fontSize = 28.sp,
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = "Back", modifier = modifier.size(28.dp)
+
                         )
                     }
                 },
@@ -83,8 +91,9 @@ fun SettingScreen(modifier: Modifier = Modifier, navController: NavController) {
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .background(White)
-                .padding(padding),
+                .background(Gray100)
+                .padding(padding)
+                .padding(10.dp),
         ) {
             Spacer(modifier = modifier.padding(top = 10.dp))
             SettingItem(
@@ -139,21 +148,22 @@ fun SettingItem(
 ) {
     Row(
         modifier = modifier
+            .fillMaxWidth()
             .padding(start = 10.dp)
             .clickable {
                 onCLick()
             },
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.Start
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            modifier = modifier.size(30.dp), tint = Color.Black
+            modifier = modifier.size(30.dp), tint = LightGray
         )
-        Spacer(modifier = modifier.padding(start = 16.dp))
+        Spacer(modifier = modifier.padding(start = 14.dp))
         Column(
-            modifier = modifier,
+            modifier = modifier.padding(top = 4.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start
         ) {
@@ -162,13 +172,17 @@ fun SettingItem(
                 text = text,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Start
+                textAlign = TextAlign.Start,
+                color = White
             )
+            Spacer(modifier = modifier.padding(top = 4.dp))
+
             Text(
                 text = description,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Normal,
-                textAlign = TextAlign.Start
+                textAlign = TextAlign.Start,
+                color = LightGray
             )
         }
     }

@@ -86,7 +86,7 @@ android {
         implementation("com.squareup.retrofit2:converter-gson:2.11.0")
         implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
-
+        implementation("androidx.work:work-runtime-ktx:2.8.1")
 
         implementation("androidx.compose.material:material-icons-extended:1.7.0-rc01")
         implementation("androidx.room:room-ktx:2.6.1")
@@ -121,4 +121,7 @@ android {
         implementation("androidx.glance:glance-appwidget:1.1.0")
         implementation("androidx.glance:glance-material3:1.1.0")
 
+
+        // Bitmap
+        implementation("androidx.compose.ui:ui:1.6.0-alpha03")
 }

@@ -1,12 +1,15 @@
 package com.example.shayariapp.widget
 
 import android.content.Context
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.Button
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
+import androidx.glance.GlanceTheme
 import androidx.glance.action.actionStartActivity
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
@@ -31,25 +34,24 @@ import kotlin.random.Random
 class SimpleWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val shayari = fetchRandomShayari(context)
+        actionStartActivity<MainActivity>()
         provideContent {
             Column(
-                modifier = GlanceModifier.fillMaxSize().background(Color.Black),
+                modifier = GlanceModifier.fillMaxSize()
+                    .background(GlanceTheme.colors.widgetBackground),
                 verticalAlignment = Alignment.Vertical.CenterVertically,
                 horizontalAlignment = Alignment.Horizontal.CenterHorizontally
             ) {
                 Text(
-                    text = shayari, style =
-                    TextStyle(
-                        fontSize = 22.sp,
-                        fontFamily = FontFamily.Serif,
-                        color = ColorProvider(Color.White),
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
+                    text = shayari,
+                    style = TextStyle(
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center,
+                        color = GlanceTheme.colors.onSurface
                     ),
                     modifier = GlanceModifier.padding(10.dp)
                 )
-                Button(text = "Click Me", onClick = { actionStartActivity<MainActivity>() })
-
             }
         }
     }

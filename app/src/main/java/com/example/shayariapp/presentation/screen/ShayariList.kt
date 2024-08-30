@@ -20,18 +20,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.IosShare
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -46,7 +43,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -57,10 +53,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.shayariapp.data.db.ShayariEntity
 import com.example.shayariapp.navigation.Routes
-import com.example.shayariapp.ui.theme.Blue100
-import com.example.shayariapp.ui.theme.Blue40
+import com.example.shayariapp.ui.theme.Gray100
+import com.example.shayariapp.ui.theme.Gray40
 import com.example.shayariapp.viewmodel.ShayariViewModel
-import kotlin.text.Typography.quote
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,21 +66,22 @@ fun ShayariList(
 ) {
     val viewModel: ShayariViewModel = hiltViewModel()
     val shayariGenre by viewModel.getShayariByGenre(genre).collectAsState(initial = emptyList())
-    val shayari by viewModel.quoteList.collectAsState(initial = emptyList())
+    val shayari by viewModel.shayariList.collectAsState(initial = emptyList())
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val context = LocalContext.current
     val clipboardManager: ClipboardManager =
         context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-
-
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = White,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    containerColor = Gray100,
+                    titleContentColor = Gray100,
+                    actionIconContentColor = White,
+                    navigationIconContentColor = White,
+                    scrolledContainerColor = Gray100
                 ),
                 title = {
                     Text(
@@ -93,9 +89,8 @@ fun ShayariList(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Cursive,
-                        color = Color.Black, fontSize = 38.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color.White, fontSize = 28.sp,
                     )
                 },
                 navigationIcon = {
@@ -103,7 +98,7 @@ fun ShayariList(
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "Back",
-                            modifier = modifier.size(30.dp)
+                            modifier = modifier.size(28.dp)
 
                         )
                     }
@@ -111,9 +106,9 @@ fun ShayariList(
                 actions = {
                     IconButton(onClick = { navController.navigate(Routes.Saved.route) }) {
                         Icon(
-                            imageVector = Icons.Filled.Bookmark,
+                            imageVector = Icons.Filled.FavoriteBorder,
                             contentDescription = "Localized description",
-                            modifier = modifier.size(30.dp)
+                            modifier = modifier.size(28.dp)
                         )
                     }
                 },
@@ -124,8 +119,8 @@ fun ShayariList(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .background(Color.White)
-                .padding(padding),
+                .padding(padding)
+                .background(Gray100),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (shayari.isEmpty() || shayariGenre.isEmpty()) {
@@ -139,14 +134,12 @@ fun ShayariList(
             } else {
                 LazyColumn {
                     items(shayariGenre) { shayari ->
-                        ShayariItem(
-                            shayari = shayari,
+                        ShayariItem(shayari = shayari,
                             onClick = {
                                 // Navigate to detail screen, adjust route if using unique ID
                                 navController.navigate(
                                     Routes.ShayariDetail.route.replace(
-                                        "{shayariId}",
-                                        shayari.id.toString()
+                                        "{shayariId}", shayari.id.toString()
                                     )
                                 )
                             },
@@ -160,16 +153,15 @@ fun ShayariList(
                                 }
                                 context.startActivity(
                                     Intent.createChooser(
-                                        shareIntent,
-                                        "Share via"
+                                        shareIntent, "Share via"
                                     )
                                 )
 
 
-                            }, onCopyClicked = {
+                            },
+                            onCopyClicked = {
                                 val clip = ClipData.newPlainText(
-                                    "Quote",
-                                    shayari.text
+                                    "Quote", shayari.text
                                 )
                                 clipboardManager.setPrimaryClip(clip)
                                 Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT)
@@ -192,92 +184,71 @@ private fun ShayariItem(
     onCopyClicked: () -> Unit,
 
     ) {
-
     Card(
         modifier = Modifier
             .padding(10.dp)
             .clickable { onClick() },
         elevation = CardDefaults.cardElevation(10.dp),
-        colors = CardDefaults.cardColors(Color.White)
+        colors = CardDefaults.cardColors(Gray40),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
-            Spacer(modifier = Modifier.height(10.dp))
-
 
             Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = shayari.text,
-                fontSize = 30.sp,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Medium,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = White
             )
+            Spacer(modifier = Modifier.height(20.dp))
+
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(20.dp),
+                verticalAlignment = Alignment.CenterVertically,
+
             ) {
-                Button(
-                    onClick = onSaveClicked,
-                    modifier = Modifier.padding(top = 18.dp),
-                    colors = ButtonColors(
-                        containerColor = Blue40,
-                        contentColor = Color.White,
-                        disabledContainerColor = Blue100,
-                        disabledContentColor = Color.White
-                    )
-                ) {
-                    Icon(
-                        imageVector = if (isBookmarked) Icons.Default.Bookmark else
-                            Icons.Default.BookmarkBorder,
-                        contentDescription = null, modifier = Modifier.padding(2.dp)
-                    )
-                }
-                Button(
-                    onClick = {
-                        onCopyClicked()
+                Spacer(modifier = Modifier.padding(start = 80.dp))
 
-                    },
-                    modifier = Modifier.padding(top = 18.dp),
-                    colors = ButtonColors(
-                        containerColor = Blue40,
-                        contentColor = Color.White,
-                        disabledContainerColor = Blue100,
-                        disabledContentColor = Color.White
-                    )
-                ) {
+                Icon(imageVector = if (isBookmarked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .clickable {
+                            onSaveClicked()
+                        }
+                        .size(30.dp), tint = White)
 
-                    Icon(
-                        imageVector = Icons.Default.ContentCopy,
-                        contentDescription = "Copy to clipboard", modifier = Modifier.padding(2.dp)
-                    )
-                }
-                Button(
-                    onClick = {
-                        onShareClicked()
 
-                    },
-                    modifier = Modifier.padding(top = 18.dp),
-                    colors = ButtonColors(
-                        containerColor = Blue40,
-                        contentColor = Color.White,
-                        disabledContainerColor = Blue100,
-                        disabledContentColor = Color.White
-                    )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Share,
-                        contentDescription = "Share quote", modifier = Modifier.padding(2.dp)
-                    )
-                }
+                Icon(imageVector = Icons.Default.ContentCopy,
+                    contentDescription = "Copy to clipboard",
+                    modifier = Modifier
+                        .clickable {
+                            onCopyClicked()
+                        }
+                        .size(30.dp), tint = White
+                )
+
+
+                Icon(imageVector = Icons.Filled.IosShare,
+                    contentDescription = "Share quote",
+                    modifier = Modifier
+                        .clickable {
+                            onShareClicked()
+                        }
+                        .size(30.dp), tint = White
+
+                )
             }
+            Spacer(modifier = Modifier.height(10.dp))
+
         }
     }
 }

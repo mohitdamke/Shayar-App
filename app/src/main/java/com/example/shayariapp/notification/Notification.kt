@@ -8,9 +8,16 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.compose.foundation.Image
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.ui.graphics.Color.Companion.Red
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.painterResource
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.IconCompat
 import com.example.shayariapp.MainActivity
 import com.example.shayariapp.R
 
@@ -32,10 +39,10 @@ fun createNotificationChannel(context: Context) {
     }
 }
 
-fun sendQuoteNotification(context: Context, quote: String, author: String) {
+fun sendQuoteNotification(context: Context, shayari: String) {
+    createNotificationChannel(context)
     val intent = Intent(context, MainActivity::class.java).apply {
-        putExtra("QUOTE", quote)
-        putExtra("AUTHOR", author)
+        putExtra("SHAYARI", shayari)
     }
     val pendingIntent: PendingIntent = PendingIntent.getActivity(
         context,
@@ -45,12 +52,15 @@ fun sendQuoteNotification(context: Context, quote: String, author: String) {
     )
 
     val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-        .setSmallIcon(R.drawable.ic_copy) // Ensure this icon exists
-        .setContentTitle("New Quote")
-        .setContentText("$quote - $author")
+        .setSmallIcon(
+           R.drawable.notification
+
+        )
+        .setContentTitle("Shayar App")
+        .setContentText(shayari)
         .setStyle(
             NotificationCompat.BigTextStyle()
-                .bigText("$quote - $author")
+                .bigText(shayari)
         )
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         .setContentIntent(pendingIntent)
