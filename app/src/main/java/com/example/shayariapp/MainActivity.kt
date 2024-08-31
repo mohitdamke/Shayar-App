@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun scheduleWidgetUpdate() {
-        val workRequest = PeriodicWorkRequestBuilder<ShayariWidgetWorker>(30, TimeUnit.MINUTES)
+        val workRequest = PeriodicWorkRequestBuilder<ShayariWidgetWorker>(6, TimeUnit.HOURS)
             .build()
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(

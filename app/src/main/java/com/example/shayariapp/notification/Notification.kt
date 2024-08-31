@@ -42,7 +42,7 @@ fun createNotificationChannel(context: Context) {
 fun sendQuoteNotification(context: Context, shayari: String) {
     createNotificationChannel(context)
     val intent = Intent(context, MainActivity::class.java).apply {
-        putExtra("SHAYARI", shayari)
+        putExtra("SHAYAR", shayari)
     }
     val pendingIntent: PendingIntent = PendingIntent.getActivity(
         context,
@@ -56,7 +56,7 @@ fun sendQuoteNotification(context: Context, shayari: String) {
            R.drawable.notification
 
         )
-        .setContentTitle("Shayar App")
+        .setContentTitle("Shayar")
         .setContentText(shayari)
         .setStyle(
             NotificationCompat.BigTextStyle()

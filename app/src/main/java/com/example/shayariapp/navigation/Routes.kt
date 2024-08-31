@@ -8,4 +8,5 @@ sealed class Routes (val route: String ){
     object ShayariDetail: Routes("shayari_detail/{shayariId}")
     object Privacy: Routes("privacy")
     object Setting: Routes("setting")
+    object Color: Routes("color")
 }

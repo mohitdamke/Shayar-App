@@ -35,13 +35,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
@@ -52,48 +50,45 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.shayariapp.data.db.ShayariEntity
 import com.example.shayariapp.navigation.Routes
-import com.example.shayariapp.ui.theme.Gray100
-import com.example.shayariapp.ui.theme.Gray40
+import com.example.shayariapp.ui.theme.LocalCustomColors
 import com.example.shayariapp.viewmodel.ShayariViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Saved(
+fun ShayariListScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
+    genre: String,
 ) {
-
-    val context = LocalContext.current
     val viewModel: ShayariViewModel = hiltViewModel()
-    val bookmarkedShayari by viewModel.bookmarkedShayari.collectAsState(initial = emptyList())
+    val shayariGenre by viewModel.getShayariByGenre(genre).collectAsState(initial = emptyList())
+    val shayari by viewModel.shayariList.collectAsState(initial = emptyList())
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val context = LocalContext.current
     val clipboardManager: ClipboardManager =
         context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-
-    LaunchedEffect(Unit) {
-        viewModel.getBookmarkedQuotes()
-    }
+    val customColors = LocalCustomColors.current
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Gray100,
-                    titleContentColor = Gray100,
-                    actionIconContentColor = White,
-                    navigationIconContentColor = White,
-                    scrolledContainerColor = Gray100
+                    containerColor = customColors.primary,
+                    titleContentColor = customColors.surface,
+                    actionIconContentColor = customColors.surface,
+                    navigationIconContentColor = customColors.surface,
+                    scrolledContainerColor = customColors.primary
                 ),
                 title = {
                     Text(
-                        text = "Saved Quotes",
+                        text = "$genre Shayari",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color.White, fontSize = 28.sp,
+                        fontWeight = FontWeight.ExtraBold, fontSize = 28.sp,
                     )
                 },
                 navigationIcon = {
@@ -106,6 +101,15 @@ fun Saved(
                         )
                     }
                 },
+                actions = {
+                    IconButton(onClick = { navController.navigate(Routes.Saved.route) }) {
+                        Icon(
+                            imageVector = Icons.Filled.FavoriteBorder,
+                            contentDescription = "Localized description",
+                            modifier = modifier.size(28.dp)
+                        )
+                    }
+                },
                 scrollBehavior = scrollBehavior,
             )
         },
@@ -113,72 +117,85 @@ fun Saved(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .background(Gray100)
-                .padding(padding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(padding)
+                .background(customColors.primary),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            LazyColumn(modifier = modifier.fillMaxSize()) {
-                items(bookmarkedShayari) { shayari ->
-                    ShayariItem(
-                        shayari = shayari.text,
-                        isBookmarked = shayari.isBookmarked,
-                        onClick = {
-                            // Navigate to detail screen, adjust route if using unique ID
-                            navController.navigate(
-                                Routes.ShayariDetail.route.replace(
-                                    "{shayariId}", shayari.id.toString()
-                                )
-                            )
-                        },
-                        onSaveClicked = {
-                            viewModel.saveOrUnsaveQuote(shayari, context)
-                        },
-                        onShareClicked = {
-                            val shareIntent = Intent().apply {
-                                action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, shayari.text)
-                                type = "text/plain"
-                            }
-                            context.startActivity(
-                                Intent.createChooser(
-                                    shareIntent, "Share via"
-                                )
-                            )
-
-
-                        },
-                        onCopyClicked = {
-                            val clip = ClipData.newPlainText(
-                                "Quote", shayari.text
-                            )
-                            clipboardManager.setPrimaryClip(clip)
-                            Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT)
-                                .show()
-                        })
+            if (shayari.isEmpty() || shayariGenre.isEmpty()) {
+                Column(
+                    modifier = modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(text = "No Shayari Found", fontSize = 30.sp, fontWeight = FontWeight.Bold)
                 }
+            } else {
+                LazyColumn {
+                    items(shayariGenre) { shayari ->
+                        ShayariItem(shayari = shayari,
+                            onClick = {
+                                // Navigate to detail screen, adjust route if using unique ID
+                                navController.navigate(
+                                    Routes.ShayariDetail.route.replace(
+                                        "{shayariId}", shayari.id.toString()
+                                    )
+                                )
+                            },
+                            isBookmarked = shayari.isBookmarked,
+                            onSaveClicked = { viewModel.saveOrUnsaveQuote(shayari, context) },
+                            onShareClicked = {
+                                val shareIntent = Intent().apply {
+                                    action = Intent.ACTION_SEND
+                                    putExtra(Intent.EXTRA_TEXT, shayari.text)
+                                    type = "text/plain"
+                                }
+                                context.startActivity(
+                                    Intent.createChooser(
+                                        shareIntent, "Share via"
+                                    )
+                                )
 
+
+                            },
+                            onCopyClicked = {
+                                val clip = ClipData.newPlainText(
+                                    "Quote", shayari.text
+                                )
+                                clipboardManager.setPrimaryClip(clip)
+                                Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT)
+                                    .show()
+                            },
+                            cardColor = customColors.secondary,
+                            titleColor = customColors.surface,
+                            iconColor = customColors.surface
+                        )
+                    }
+                }
             }
         }
     }
 }
 
-
 @Composable
 private fun ShayariItem(
-    shayari: String,
+    shayari: ShayariEntity,
+    onClick: () -> Unit,
     isBookmarked: Boolean,
     onSaveClicked: () -> Unit,
     onShareClicked: () -> Unit,
-    onClick: () -> Unit,
     onCopyClicked: () -> Unit,
-) {
+    cardColor: Color,
+    titleColor: Color,
+    iconColor: Color,
+
+
+    ) {
     Card(
         modifier = Modifier
             .padding(10.dp)
             .clickable { onClick() },
         elevation = CardDefaults.cardElevation(10.dp),
-        colors = CardDefaults.cardColors(Gray40)
+        colors = CardDefaults.cardColors(cardColor),
     ) {
         Column(
             modifier = Modifier
@@ -187,16 +204,14 @@ private fun ShayariItem(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
-            Spacer(modifier = Modifier.height(10.dp))
-
 
             Spacer(modifier = Modifier.height(10.dp))
             Text(
-                text = shayari,
+                text = shayari.text,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center,
-                color = White
+                color = titleColor
             )
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -215,7 +230,8 @@ private fun ShayariItem(
                         .clickable {
                             onSaveClicked()
                         }
-                        .size(30.dp), tint = White)
+                        .size(30.dp), tint = iconColor
+                )
 
 
                 Icon(imageVector = Icons.Default.ContentCopy,
@@ -224,7 +240,7 @@ private fun ShayariItem(
                         .clickable {
                             onCopyClicked()
                         }
-                        .size(30.dp), tint = White
+                        .size(30.dp), tint = iconColor
                 )
 
 
@@ -234,7 +250,7 @@ private fun ShayariItem(
                         .clickable {
                             onShareClicked()
                         }
-                        .size(30.dp), tint = White
+                        .size(30.dp), tint = iconColor
 
                 )
             }
@@ -243,3 +259,8 @@ private fun ShayariItem(
         }
     }
 }
+
+
+
+
+

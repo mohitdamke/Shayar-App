@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -45,8 +44,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
-import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -60,7 +59,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.shayariapp.R
 import com.example.shayariapp.ui.theme.Gray100
-import com.example.shayariapp.ui.theme.Gray40
+import com.example.shayariapp.ui.theme.LocalCustomColors
 import com.example.shayariapp.viewmodel.ShayariViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -80,6 +79,9 @@ fun ShayariDetailScreen(
         context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     var fullScreenshot by remember { mutableStateOf<Bitmap?>(null) }
     var isIconsVisible by remember { mutableStateOf(true) }
+    val customColors = LocalCustomColors.current
+
+
 
     shayari?.let { quote ->
         ShayariDetailItem(
@@ -104,7 +106,10 @@ fun ShayariDetailScreen(
                         shareImageContent(fullScreenshot!!, context)
                     }
                 }
-            }, isIconsVisible = isIconsVisible
+            }, isIconsVisible = isIconsVisible,
+            cardColor = customColors.secondary,
+            titleColor = customColors.surface,
+            iconColor = customColors.surface
         )
     } ?: run {
         Column(
@@ -134,13 +139,16 @@ private fun ShayariDetailItem(
     onSaveClicked: () -> Unit,
     onShareClicked: () -> Unit,
     onCopyClicked: () -> Unit,
-    isIconsVisible: Boolean
+    isIconsVisible: Boolean,
+    cardColor: Color,
+    titleColor: Color,
+    iconColor: Color,
 ) {
     Scaffold { paddingValues ->
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .background(Gray100)
+                .background(cardColor)
         ) {
             Column(
                 modifier = modifier
@@ -163,7 +171,7 @@ private fun ShayariDetailItem(
                             fontSize = 28.sp,
                             fontWeight = FontWeight.Medium,
                             textAlign = TextAlign.Center,
-                            color = White
+                            color = titleColor
                         )
                         Spacer(modifier = modifier.padding(top = 10.dp))
                         Card(
@@ -216,7 +224,7 @@ private fun ShayariDetailItem(
                                         onSaveClicked()
                                     }
                                     .size(40.dp),
-                                tint = White)
+                                tint = iconColor)
 
 
                             Icon(imageVector = Icons.Default.ContentCopy,
@@ -226,7 +234,7 @@ private fun ShayariDetailItem(
                                         onCopyClicked()
                                     }
                                     .size(40.dp),
-                                tint = White)
+                                tint = iconColor)
 
 
                             Icon(imageVector = Icons.Filled.IosShare,
@@ -236,7 +244,7 @@ private fun ShayariDetailItem(
                                         onShareClicked()
                                     }
                                     .size(40.dp),
-                                tint = White
+                                tint = iconColor
 
                             )
                         }

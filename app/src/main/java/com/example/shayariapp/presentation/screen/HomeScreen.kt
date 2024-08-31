@@ -54,6 +54,7 @@ import com.example.shayariapp.common.ShimmerEffect
 import com.example.shayariapp.navigation.Routes
 import com.example.shayariapp.ui.theme.Gray100
 import com.example.shayariapp.ui.theme.Gray40
+import com.example.shayariapp.ui.theme.LocalCustomColors
 import com.example.shayariapp.viewmodel.ShayariViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,12 +68,20 @@ fun HomeScreen(
     val viewModel: ShayariViewModel = hiltViewModel()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val isLoading by viewModel.isLoading.observeAsState(true)
+    val customColors = LocalCustomColors.current
 
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = customColors.primary,
+                    titleContentColor = customColors.surface,
+                    actionIconContentColor = customColors.surface,
+                    navigationIconContentColor = customColors.surface,
+                    scrolledContainerColor = customColors.primary
+                ),
                 title = {
                     Text(
                         text = "Shayar",
@@ -82,7 +91,6 @@ fun HomeScreen(
                         fontStyle = FontStyle.Normal,
                         fontWeight = FontWeight.ExtraBold,
                         fontFamily = FontFamily.SansSerif,
-                        color = White
                     )
                 },
                 actions = {
@@ -100,13 +108,7 @@ fun HomeScreen(
                             modifier = modifier.size(28.dp)
                         )
                     }
-                }, colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Gray100,
-                    titleContentColor = Gray100,
-                    actionIconContentColor = White,
-                    navigationIconContentColor = White,
-                    scrolledContainerColor = Gray100
-                ),
+                },
                 scrollBehavior = scrollBehavior
             )
         },
@@ -116,7 +118,7 @@ fun HomeScreen(
             modifier = modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(Gray100),
+                .background(customColors.primary),
             contentPadding = PaddingValues(2.dp)
         ) {
             if (isLoading) {
@@ -135,7 +137,10 @@ fun HomeScreen(
                 ) { genre ->
                     ShayariGenre(
                         genre = genre,
-                        navController = navController
+                        navController = navController,
+                        cardColor = customColors.secondary,
+                        titleColor = customColors.surface,
+                        iconColor = customColors.surface
                     )
                 }
             }
@@ -148,8 +153,12 @@ fun HomeScreen(
 private fun ShayariGenre(
     modifier: Modifier = Modifier,
     genre: String,
-    navController: NavController
-) {
+    navController: NavController,
+    cardColor: Color,
+    titleColor: Color,
+    iconColor: Color,
+
+    ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -161,7 +170,7 @@ private fun ShayariGenre(
                 )
             },
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(Gray40),
+        colors = CardDefaults.cardColors(cardColor),
 
         ) {
         Row(
@@ -176,7 +185,7 @@ private fun ShayariGenre(
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center,
-                color = White,
+                color = titleColor,
                 fontStyle = FontStyle.Normal,
                 modifier = modifier
             )
@@ -184,13 +193,12 @@ private fun ShayariGenre(
             Icon(
                 imageVector = Icons.Filled.ArrowForwardIos,
                 contentDescription = "ArrowForwardIos",
-                modifier = modifier.size(30.dp), tint = White
+                modifier = modifier.size(30.dp), tint = iconColor
             )
         }
     }
 }
 
-@Preview(showBackground = true)
 @Composable
 fun ShimmerGenreCard(modifier: Modifier = Modifier) {
     Card(
@@ -199,7 +207,6 @@ fun ShimmerGenreCard(modifier: Modifier = Modifier) {
             .padding(6.dp)
             .height(60.dp),
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(Gray100),
     ) {
         Row(
             modifier = Modifier

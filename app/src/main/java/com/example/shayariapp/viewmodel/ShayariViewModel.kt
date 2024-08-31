@@ -1,6 +1,8 @@
 package com.example.shayariapp.viewmodel
 
 import android.content.Context
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,6 +10,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.shayariapp.data.db.ShayariEntity
 import com.example.shayariapp.domain.repository.ShayariRepository
 import com.example.shayariapp.notification.sendQuoteNotification
+import com.example.shayariapp.ui.theme.CustomColors
+import com.example.shayariapp.ui.theme.defaultColor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,8 +23,7 @@ import kotlin.random.Random
 @HiltViewModel
 class ShayariViewModel @Inject constructor(
     private var repository: ShayariRepository,
-
-    ) : ViewModel() {
+) : ViewModel() {
 
     private val _shayariList = MutableStateFlow<List<ShayariEntity>>(emptyList())
     val shayariList: StateFlow<List<ShayariEntity>> get() = _shayariList
@@ -80,22 +83,6 @@ class ShayariViewModel @Inject constructor(
         }
     }
 
-    fun searchQuotes(query: String) {
-        viewModelScope.launch {
-
-            repository.searchQuotes(query).collect { quotes ->
-                _shayariList.value = quotes
-            }
-        }
-    }
-
-    fun searchQuotesGenre(query: String) {
-        viewModelScope.launch {
-            repository.searchQuotesGenre(query).collect { quotes ->
-                _shayariList.value = quotes
-            }
-        }
-    }
 
 
 }
