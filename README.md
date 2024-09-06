@@ -1,7 +1,3 @@
-Here's a template for your Shayar App's README on GitHub:
-
----
-
 # Shayar App
 
 **Shayar App** is a user-friendly offline mobile application built with Android technologies, allowing users to explore and enjoy various genres of Shayari. The app stores Shayari in a local Room database, enabling users to read, copy, share, and take screenshots of their favorite Shayari. With a personalized experience, the app also includes features like color customization, notifications, and a widget setup.
