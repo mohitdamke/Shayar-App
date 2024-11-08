@@ -10,7 +10,8 @@ import com.example.shayariapp.notification.sendQuoteNotification
 import kotlinx.coroutines.flow.first
 import kotlin.random.Random
 
-class ShayariWidgetWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+class ShayariWidgetWorker(context: Context, params: WorkerParameters) :
+    CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
         val widgetManager = GlanceAppWidgetManager(applicationContext)
         val widgetIds = widgetManager.getGlanceIds(SimpleWidget::class.java)

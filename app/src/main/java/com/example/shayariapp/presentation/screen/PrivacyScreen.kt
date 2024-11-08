@@ -28,7 +28,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.glance.GlanceTheme.colors
 import androidx.navigation.NavController
 import com.example.shayariapp.navigation.Routes
 import com.example.shayariapp.ui.theme.LocalCustomColors

@@ -58,7 +58,6 @@ import androidx.core.view.drawToBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.shayariapp.R
-import com.example.shayariapp.ui.theme.Gray100
 import com.example.shayariapp.ui.theme.LocalCustomColors
 import com.example.shayariapp.viewmodel.ShayariViewModel
 import kotlinx.coroutines.delay

@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.shayariapp.navigation.Routes
-import com.example.shayariapp.ui.theme.CustomColors
 import com.example.shayariapp.ui.theme.LocalCustomColors
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,114 +57,113 @@ fun SettingScreen(
     val customColors = LocalCustomColors.current
 
 
-        Scaffold(
-            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-            topBar = {
-                TopAppBar(
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = customColors.primary,
-                        titleContentColor = customColors.surface,
-                        actionIconContentColor = customColors.surface,
-                        navigationIconContentColor = customColors.surface,
-                        scrolledContainerColor = customColors.primary
-                    ),
-                    title = {
-                        Text(
-                            text = "Settings",
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 28.sp,
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            TopAppBar(
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = customColors.primary,
+                    titleContentColor = customColors.surface,
+                    actionIconContentColor = customColors.surface,
+                    navigationIconContentColor = customColors.surface,
+                    scrolledContainerColor = customColors.primary
+                ),
+                title = {
+                    Text(
+                        text = "Settings",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontStyle = FontStyle.Normal,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 28.sp,
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "Back", modifier = modifier.size(28.dp)
+
                         )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = { navController.navigateUp() }) {
-                            Icon(
-                                imageVector = Icons.Filled.ArrowBack,
-                                contentDescription = "Back", modifier = modifier.size(28.dp)
+                    }
 
-                            )
-                        }
+                },
+                actions = {
+                    IconButton(onClick = { navController.navigate(Routes.Color.route) }) {
+                        Icon(
+                            imageVector = Icons.Filled.Colorize,
+                            contentDescription = "Color", modifier = modifier.size(28.dp)
 
-                    }, actions = {
-                        IconButton(onClick = { navController.navigate(Routes.Color.route) }) {
-                            Icon(
-                                imageVector = Icons.Filled.Colorize,
-                                contentDescription = "Color", modifier = modifier.size(28.dp)
+                        )
+                    }
+                },
+                scrollBehavior = scrollBehavior,
+            )
+        },
+    ) { padding ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .background(customColors.primary)
+                .padding(padding)
+                .padding(10.dp),
+        ) {
+            Spacer(modifier = modifier.padding(top = 10.dp))
+            SettingItem(
+                onCLick = { navController.navigate(Routes.Home.route) },
+                icon = Icons.Default.Home,
+                text = "Home",
+                description = "Back to Home",
+                iconColor = customColors.surface,
+                titleColor = customColors.surface,
+                despColor = customColors.surface,
+                cardColor = customColors.secondary
+            )
+            Spacer(modifier = modifier.padding(top = 20.dp))
+            SettingItem(
+                onCLick = { navController.navigate(Routes.Saved.route) },
+                icon = Icons.Default.Bookmark,
+                text = "Bookmark",
+                description = "View your saved quotes",
+                iconColor = customColors.surface,
+                titleColor = customColors.surface,
+                despColor = customColors.surface,
+                cardColor = customColors.secondary
 
-                            )
-                        }
-                    },
-                    scrollBehavior = scrollBehavior,
-                )
-            },
-        ) { padding ->
-            Column(
-                modifier = modifier
-                    .fillMaxSize()
-                    .background(customColors.primary)
-                    .padding(padding)
-                    .padding(10.dp),
-            ) {
-                Spacer(modifier = modifier.padding(top = 10.dp))
-                SettingItem(
-                    onCLick = { navController.navigate(Routes.Home.route) },
-                    icon = Icons.Default.Home,
-                    text = "Home",
-                    description = "Back to Home",
-                    iconColor = customColors.surface,
-                    titleColor = customColors.surface,
-                    despColor = customColors.surface,
-                    cardColor = customColors.secondary
-                )
-                Spacer(modifier = modifier.padding(top = 20.dp))
-                SettingItem(
-                    onCLick = { navController.navigate(Routes.Saved.route) },
-                    icon = Icons.Default.Bookmark,
-                    text = "Bookmark",
-                    description = "View your saved quotes",
-                    iconColor = customColors.surface,
-                    titleColor = customColors.surface,
-                    despColor = customColors.surface,
-                    cardColor = customColors.secondary
+            )
+            Spacer(modifier = modifier.padding(top = 20.dp))
+            SettingItem(
+                onCLick = {
+                    val shareIntent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, Typography.quote)
+                        type = "text/plain"
+                    }
+                    context.startActivity(Intent.createChooser(shareIntent, "Share via"))
+                },
+                icon = Icons.Default.Share,
+                text = "Share with friends",
+                description = "Share the app with your friends",
+                iconColor = customColors.surface,
+                titleColor = customColors.surface,
+                despColor = customColors.surface,
+                cardColor = customColors.secondary
+            )
+            Spacer(modifier = modifier.padding(top = 20.dp))
+            SettingItem(
+                onCLick = { navController.navigate(Routes.Privacy.route) },
+                icon = Icons.Default.PrivacyTip,
+                text = "Privacy & Policy",
+                description = "Review our privacy policy",
+                iconColor = customColors.surface,
+                titleColor = customColors.surface,
+                despColor = customColors.surface,
+                cardColor = customColors.secondary
+            )
 
-                )
-                Spacer(modifier = modifier.padding(top = 20.dp))
-                SettingItem(
-                    onCLick = {
-                        val shareIntent = Intent().apply {
-                            action = Intent.ACTION_SEND
-                            putExtra(Intent.EXTRA_TEXT, Typography.quote)
-                            type = "text/plain"
-                        }
-                        context.startActivity(Intent.createChooser(shareIntent, "Share via"))
-                    },
-                    icon = Icons.Default.Share,
-                    text = "Share with friends",
-                    description = "Share the app with your friends",
-                    iconColor = customColors.surface,
-                    titleColor = customColors.surface,
-                    despColor = customColors.surface,
-                    cardColor = customColors.secondary
-                )
-                Spacer(modifier = modifier.padding(top = 20.dp))
-                SettingItem(
-                    onCLick = { navController.navigate(Routes.Privacy.route) },
-                    icon = Icons.Default.PrivacyTip,
-                    text = "Privacy & Policy",
-                    description = "Review our privacy policy",
-                    iconColor = customColors.surface,
-                    titleColor = customColors.surface,
-                    despColor = customColors.surface,
-                    cardColor = customColors.secondary
-                )
-
-            }
         }
     }
-
-
+}
 
 
 @Composable

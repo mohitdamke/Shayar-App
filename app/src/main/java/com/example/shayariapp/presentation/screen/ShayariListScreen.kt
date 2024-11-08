@@ -132,7 +132,8 @@ fun ShayariListScreen(
             } else {
                 LazyColumn {
                     items(shayariGenre) { shayari ->
-                        ShayariItem(shayari = shayari,
+                        ShayariItem(
+                            shayari = shayari,
                             onClick = {
                                 // Navigate to detail screen, adjust route if using unique ID
                                 navController.navigate(

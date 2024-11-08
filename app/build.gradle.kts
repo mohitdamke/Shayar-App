@@ -82,10 +82,6 @@ android {
         debugImplementation(libs.androidx.ui.tooling)
         debugImplementation(libs.androidx.ui.test.manifest)
 
-        implementation("com.squareup.retrofit2:retrofit:2.11.0")
-        implementation("com.squareup.retrofit2:converter-gson:2.11.0")
-        implementation("com.squareup.okhttp3:okhttp:4.12.0")
-
         implementation("androidx.work:work-runtime-ktx:2.8.1")
 
         implementation("androidx.compose.material:material-icons-extended:1.7.0-rc01")

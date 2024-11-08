@@ -7,7 +7,6 @@ import javax.inject.Inject
 
 class ShayariRepository @Inject constructor(private val shayariDao: ShayariDao) {
 
-
     fun getShayariByGenre(genre: String): Flow<List<ShayariEntity>> {
         return shayariDao.getShayariByGenre(genre)
     }
@@ -15,18 +14,12 @@ class ShayariRepository @Inject constructor(private val shayariDao: ShayariDao) 
     fun getShayariById(id: String): Flow<ShayariEntity?> {
         return shayariDao.getShayariById(id)
     }
+
     fun getAllQuote(): Flow<List<ShayariEntity>> = shayariDao.getShayari()
 
     fun getBookmarkedQuotes(): Flow<List<ShayariEntity>> = shayariDao.getBookmarkedQuotes()
     suspend fun updateQuote(quote: ShayariEntity) {
         shayariDao.updateQuote(quote)
-    }
-
-    fun searchQuotes(query: String): Flow<List<ShayariEntity>> {
-        return shayariDao.searchQuotes("%$query%")
-    }
-    fun searchQuotesGenre(query: String): Flow<List<ShayariEntity>> {
-        return shayariDao.searchQuotesGenre("%$query%")
     }
 
 }

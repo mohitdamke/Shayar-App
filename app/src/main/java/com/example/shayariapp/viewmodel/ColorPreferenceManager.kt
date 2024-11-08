@@ -9,7 +9,7 @@ import com.google.gson.reflect.TypeToken
 
 class ColorPreferenceManager(context: Context) {
 
-    private val sharedPreferences: SharedPreferences = 
+    private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences("color_preferences", Context.MODE_PRIVATE)
     private val gson = Gson()
 

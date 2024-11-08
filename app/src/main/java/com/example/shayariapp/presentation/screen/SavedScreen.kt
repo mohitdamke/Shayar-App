@@ -93,7 +93,7 @@ fun SavedScreen(
                         overflow = TextOverflow.Ellipsis,
                         fontStyle = FontStyle.Normal,
                         fontWeight = FontWeight.ExtraBold,
-                       fontSize = 28.sp,
+                        fontSize = 28.sp,
                     )
                 },
                 navigationIcon = {
@@ -158,7 +158,8 @@ fun SavedScreen(
                         },
                         cardColor = customColors.secondary,
                         titleColor = customColors.surface,
-                        iconColor = customColors.surface)
+                        iconColor = customColors.surface
+                    )
                 }
 
             }

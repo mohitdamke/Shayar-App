@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Colorize
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,10 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.glance.GlanceTheme.colors
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import com.example.shayariapp.navigation.Routes
 import com.example.shayariapp.ui.theme.ColorsProvider
 import com.example.shayariapp.ui.theme.CustomColors
 import com.example.shayariapp.ui.theme.defaultColor
@@ -132,7 +128,7 @@ fun ColorScreen(
                         )
                     },
                     navigationIcon = {
-                        IconButton(onClick = { navController.navigateUp()}) {
+                        IconButton(onClick = { navController.navigateUp() }) {
                             Icon(
                                 imageVector = Icons.Filled.ArrowBack,
                                 contentDescription = "Back", modifier = modifier.size(28.dp)

@@ -1,24 +1,18 @@
 package com.example.shayariapp.viewmodel
 
 import android.content.Context
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shayariapp.data.db.ShayariEntity
 import com.example.shayariapp.domain.repository.ShayariRepository
-import com.example.shayariapp.notification.sendQuoteNotification
-import com.example.shayariapp.ui.theme.CustomColors
-import com.example.shayariapp.ui.theme.defaultColor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.random.Random
 
 @HiltViewModel
 class ShayariViewModel @Inject constructor(
@@ -30,9 +24,6 @@ class ShayariViewModel @Inject constructor(
 
     private val _bookmarkedShayari = MutableStateFlow<List<ShayariEntity>>(emptyList())
     val bookmarkedShayari: StateFlow<List<ShayariEntity>> = _bookmarkedShayari
-
-    private val _shayariDetail = MutableStateFlow<ShayariEntity?>(null)
-    val shayariDetail: StateFlow<ShayariEntity?> = _shayariDetail
 
     private val _isLoading = MutableLiveData(true)
     val isLoading: LiveData<Boolean> = _isLoading
@@ -82,7 +73,6 @@ class ShayariViewModel @Inject constructor(
             }
         }
     }
-
 
 
 }

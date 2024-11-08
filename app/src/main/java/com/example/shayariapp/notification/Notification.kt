@@ -21,7 +21,6 @@ import androidx.core.graphics.drawable.IconCompat
 import com.example.shayariapp.MainActivity
 import com.example.shayariapp.R
 
-
 const val CHANNEL_ID = "quote_channel"
 const val NOTIFICATION_ID = 1 // Unique ID for the notification
 
